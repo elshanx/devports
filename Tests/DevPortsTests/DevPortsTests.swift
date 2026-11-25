@@ -78,6 +78,17 @@ final class DevPortsTests: XCTestCase {
         XCTAssertFalse(astro.onRandomPortsOnly)
     }
 
+    func testFilterMatchesNameFolderAndPort() {
+        let app = Listener(pid: 1, pgid: 1, name: "psstoreaz", command: "node", folder: "/Users/x/dev/shop",
+                           ports: [4321], kind: .dev, container: nil)
+        XCTAssertTrue(app.matches(""))
+        XCTAssertTrue(app.matches("STORE"))
+        XCTAssertTrue(app.matches("shop"))
+        XCTAssertTrue(app.matches("43"))
+        XCTAssertFalse(app.matches("321"))
+        XCTAssertFalse(app.matches("vite"))
+    }
+
     func testSystemListenersAreNotDevServers() {
         for listener in Scanner.scan() where Project.isProtected(command: listener.command) {
             XCTAssertNotEqual(listener.kind, .dev, listener.command)

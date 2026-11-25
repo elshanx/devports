@@ -55,16 +55,32 @@ struct ContentView: View {
         .onKeyPress(.upArrow) { moveSelection(by: -1) }
         .onKeyPress(.return) { act { $0.openInBrowser() } }
         .onKeyPress(.delete, phases: .down) { press in
-            press.modifiers.contains(.command) ? act { store.stop($0) } : .ignored
+            if press.modifiers.contains(.command) { return act { store.stop($0) } }
+            guard !store.query.isEmpty else { return .ignored }
+            filter(String(store.query.dropLast()))
+            return .handled
+        }
+        .onKeyPress(characters: Self.filterCharacters, phases: .down) { press in
+            guard press.modifiers.subtracting(.shift).isEmpty else { return .ignored }
+            filter(store.query + press.characters)
+            return .handled
         }
         .onKeyPress(.escape) {
-            close()
+            if store.query.isEmpty { close() } else { filter("") }
             return .handled
         }
         .onReceive(NotificationCenter.default.publisher(for: Self.didOpen)) { _ in
             selection = nil
+            store.query = ""
             listFocused = true
         }
+    }
+
+    private static let filterCharacters = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_."))
+
+    private func filter(_ query: String) {
+        store.query = query
+        selection = query.isEmpty ? nil : store.ordered.first?.id
     }
 
     private func moveSelection(by step: Int) -> KeyPress.Result {
@@ -85,7 +101,15 @@ struct ContentView: View {
         HStack(alignment: .firstTextBaseline) {
             Text("DevPorts").font(.system(size: 13, weight: .bold))
             Spacer()
-            Text(summary).font(.caption).foregroundStyle(.secondary)
+            if store.query.isEmpty {
+                Text(summary).font(.caption).foregroundStyle(.secondary)
+            } else {
+                Label(store.query, systemImage: "magnifyingglass")
+                    .font(.caption.monospaced())
+                    .foregroundStyle(Color.accentColor)
+                    .accessibilityLabel("Filter: " + store.query)
+                    .help("Filter. Press Esc to clear.")
+            }
         }
     }
 
@@ -97,10 +121,15 @@ struct ContentView: View {
         }
     }
 
+    private var emptyText: String {
+        if !store.query.isEmpty { return "Nothing matches \u{201C}" + store.query + "\u{201D}" }
+        return store.showAll ? "No ports in use" : "Dev servers you start show here"
+    }
+
     private var emptyState: some View {
         VStack(spacing: 6) {
             Image(systemName: "moon.zzz.fill").font(.system(size: 22)).foregroundStyle(.tertiary)
-            Text(store.showAll ? "No ports in use" : "Dev servers you start show here")
+            Text(emptyText)
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }

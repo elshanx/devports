@@ -35,7 +35,8 @@ private struct MoreMenu: View {
                 Text("↑ ↓  Select a server")
                 Text("↩ or double-click  Open in browser")
                 Text("⌘⌫  Stop selected server")
-                Text("Esc  Close")
+                Text("Type  Filter by name, folder or port")
+                Text("Esc  Clear the filter or close")
             }
             Divider()
             Button("Quit DevPorts") { NSApplication.shared.terminate(nil) }.keyboardShortcut("q")
