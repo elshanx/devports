@@ -78,6 +78,17 @@ final class DevPortsTests: XCTestCase {
         XCTAssertFalse(astro.onRandomPortsOnly)
     }
 
+    func testToolOnRandomPortInProjectIsNotDevServer() {
+        let helper = Listener(pid: 1, pgid: 1, name: "agent-kanban", command: "/bin/agent-browser --daemon",
+                              folder: "/Users/x/dev/agent-kanban", ports: [65204], kind: .dev, container: nil)
+        let demoted = Scanner.demoteHelper(helper)
+        XCTAssertEqual(demoted.kind, .other)
+        XCTAssertEqual(demoted.name, "agent-browser")
+        let server = Listener(pid: 2, pgid: 2, name: "shop", command: "node", folder: nil, ports: [3000, 65000],
+                              kind: .dev, container: nil)
+        XCTAssertEqual(Scanner.demoteHelper(server).kind, .dev)
+    }
+
     @MainActor
     func testRegistersGlobalHotKey() {
         XCTAssertTrue(HotKey {}.isRegistered)

@@ -23,7 +23,7 @@ struct Listener: Identifiable, Hashable {
 
     var onRandomPortsOnly: Bool { kind == .other && ports.allSatisfy(Self.isInternal) }
 
-    private static func isInternal(_ port: Int) -> Bool {
+    static func isInternal(_ port: Int) -> Bool {
         port >= 49152 || [9229, 9230].contains(port)
     }
 }
@@ -68,7 +68,14 @@ enum Scanner {
             return Listener(pid: main.pid, pgid: main.pgid, name: main.name, command: main.command,
                             folder: main.folder, ports: group.flatMap(\.ports).sorted(), kind: .dev, container: nil)
         }
-        return listeners.filter { $0.kind != .dev } + merged
+        return (listeners.filter { $0.kind != .dev } + merged).map(demoteHelper)
+    }
+
+    static func demoteHelper(_ listener: Listener) -> Listener {
+        guard listener.kind == .dev, listener.ports.allSatisfy(Listener.isInternal) else { return listener }
+        let tool = URL(fileURLWithPath: String(listener.command.split(separator: " ").first ?? "")).lastPathComponent
+        return Listener(pid: listener.pid, pgid: listener.pgid, name: tool, command: listener.command,
+                        folder: listener.folder, ports: listener.ports, kind: .other, container: nil)
     }
 
     static func isListening(pid: Int32) -> Bool {
