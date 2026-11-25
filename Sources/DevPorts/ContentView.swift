@@ -31,11 +31,15 @@ struct ContentView: View {
             }
             .frame(maxHeight: 460)
             .fixedSize(horizontal: false, vertical: true)
-            if let message = store.message ?? loginItem.error {
-                Label(message, systemImage: "exclamationmark.triangle.fill")
-                    .font(.caption)
-                    .foregroundStyle(.red)
-                    .padding(.horizontal, 14)
+            if let message = store.message {
+                ErrorBanner(message: message, retryTitle: "Try again", retry: store.retryFailedStops,
+                            dismiss: store.dismissMessage)
+                    .padding(.horizontal, 12)
+                    .padding(.bottom, 8)
+            } else if let error = loginItem.error {
+                ErrorBanner(message: error, retryTitle: "Open Settings", retry: loginItem.openSettings,
+                            dismiss: loginItem.dismissError)
+                    .padding(.horizontal, 12)
                     .padding(.bottom, 8)
             }
             Divider()

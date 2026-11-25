@@ -15,6 +15,14 @@ final class LoginItem {
         setEnabled(true)
     }
 
+    func dismissError() {
+        error = nil
+    }
+
+    func openSettings() {
+        SMAppService.openSystemSettingsLoginItems()
+    }
+
     func toggle() {
         setEnabled(!isEnabled)
     }

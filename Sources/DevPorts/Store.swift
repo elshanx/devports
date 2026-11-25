@@ -10,6 +10,7 @@ final class Store {
     var showRandomPorts = false
     var stopping = Set<String>()
     var message: String?
+    private(set) var failedStops: [Listener] = []
     private var timer: Timer?
 
     var query = ""
@@ -63,6 +64,17 @@ final class Store {
         }
     }
 
+    func retryFailedStops() {
+        let targets = failedStops
+        dismissMessage()
+        stopAll(targets)
+    }
+
+    func dismissMessage() {
+        message = nil
+        failedStops = []
+    }
+
     func forget(_ server: StoppedServer) {
         recentlyStopped.removeAll { $0.id == server.id }
     }
@@ -91,15 +103,20 @@ final class Store {
         stopping.formUnion(targets.map(\.id))
         Task {
             var errors: [String] = []
+            var failed: [Listener] = []
             await withTaskGroup(of: (Listener, StopResult).self) { group in
                 for target in targets { group.addTask { (target, await Killer.stop(target)) } }
                 for await (target, result) in group {
-                    if let error = result.error { errors.append(error) }
+                    if let error = result.error {
+                        errors.append(error)
+                        failed.append(target)
+                    }
                     if let spec = result.restart { remember(target, spec) }
                 }
             }
             stopping.subtract(targets.map(\.id))
             message = errors.isEmpty ? nil : errors.joined(separator: "\n")
+            failedStops = failed
             refresh()
         }
     }
