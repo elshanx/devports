@@ -10,6 +10,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+        let appMenu = NSMenu()
+        appMenu.addItem(withTitle: "Quit DevPorts", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let appMenuItem = NSMenuItem()
+        appMenuItem.submenu = appMenu
+        NSApp.mainMenu = NSMenu()
+        NSApp.mainMenu?.addItem(appMenuItem)
         let controller = NSHostingController(rootView: ContentView(store: store, loginItem: loginItem) { [weak self] in
             self?.popover.performClose(nil)
         })

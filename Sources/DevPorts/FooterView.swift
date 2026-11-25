@@ -7,29 +7,47 @@ struct FooterView: View {
     var body: some View {
         HStack(spacing: 8) {
             TintedButton(title: store.showAll ? "Show dev ports" : "Show all ports",
-                         symbol: store.showAll ? "hammer" : "list.bullet", tint: .accentColor,
+                         symbol: store.showAll ? "hammer" : "list.bullet", tint: .accentColor, quiet: true,
                          help: "Switch between dev servers and every port") { store.showAll.toggle() }
             if !store.devServers.isEmpty {
                 StopAllButton(count: store.devServers.count) { store.stopAllDevServers() }
             }
             Spacer()
-            TintedButton(symbol: "doc.text", tint: .blue, help: "Open restart logs") {
+            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh (⌘R)") { store.refresh() }
+                .keyboardShortcut("r")
+            MoreMenu(loginItem: loginItem)
+        }
+    }
+}
+
+private struct MoreMenu: View {
+    let loginItem: LoginItem
+
+    var body: some View {
+        Menu {
+            Button("Open Restart Logs") {
                 let logs = URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts")
                 try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
                 NSWorkspace.shared.open(logs)
             }
-            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh (⌘R)") { store.refresh() }
-                .keyboardShortcut("r")
-            TintedButton(symbol: loginItem.isEnabled ? "sunrise.fill" : "sunrise",
-                         tint: loginItem.isEnabled ? .purple : .gray,
-                         help: loginItem.isEnabled ? "Open at login: on (click to turn off)"
-                             : "Open at login: off (click to turn on)") {
-                loginItem.toggle()
+            Toggle("Open at Login", isOn: Binding(get: { loginItem.isEnabled }, set: { _ in loginItem.toggle() }))
+            Section("Keyboard") {
+                Text("↑ ↓  Select a server")
+                Text("↩  Open in browser")
+                Text("⌘⌫  Stop selected server")
+                Text("⌘R  Refresh")
+                Text("Esc  Close")
             }
-            TintedButton(symbol: "power", tint: .orange, help: "Quit DevPorts (⌘Q)") {
-                NSApplication.shared.terminate(nil)
-            }
-            .keyboardShortcut("q")
+            Divider()
+            Button("Quit DevPorts") { NSApplication.shared.terminate(nil) }.keyboardShortcut("q")
+        } label: {
+            Image(systemName: "ellipsis")
         }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .frame(width: 24, height: 24)
+        .help("More")
+        .accessibilityLabel("More")
     }
 }
