@@ -54,7 +54,7 @@ enum DockerReader {
 enum Project {
     static let home = FileManager.default.homeDirectoryForCurrentUser.path
     static let protectedPrefixes = ["/System", "/usr/libexec", "/usr/sbin", "/sbin", "/Applications", home + "/Library/Application Support"]
-    private static let markers = ["package.json", ".git", "Cargo.toml", "go.mod", "pyproject.toml", "Gemfile"]
+    static let markers = ["package.json", ".git", "Cargo.toml", "go.mod", "pyproject.toml", "Gemfile"]
 
     static func isProtected(command: String) -> Bool {
         !command.hasPrefix("/Applications/Xcode.app/Contents/Developer/")

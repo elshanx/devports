@@ -132,6 +132,15 @@ struct ContentView: View {
             Text(emptyText)
                 .font(.callout)
                 .foregroundStyle(.secondary)
+            if store.query.isEmpty && !store.showAll {
+                Text("A dev server listens on a port and runs in a folder with "
+                    + Project.markers.dropLast().joined(separator: ", ") + " or " + Project.markers.last! + ".")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 24)
+            }
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 18)
