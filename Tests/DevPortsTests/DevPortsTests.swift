@@ -101,7 +101,7 @@ final class DevPortsTests: XCTestCase {
     }
 
     func testFilterMatchesNameFolderAndPort() {
-        let app = Listener(pid: 1, pgid: 1, name: "psstoreaz", command: "node", folder: "/Users/x/dev/shop",
+        let app = Listener(pid: 1, pgid: 1, name: "storefront", command: "node", folder: "/Users/x/dev/shop",
                            ports: [4321], kind: .dev, container: nil)
         XCTAssertTrue(app.matches(""))
         XCTAssertTrue(app.matches("STORE"))
