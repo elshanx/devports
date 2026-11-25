@@ -4,7 +4,6 @@ struct RowView: View {
     let listener: Listener
     let stopping: Bool
     let onStop: () -> Void
-    @State private var hovering = false
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
@@ -31,11 +30,7 @@ struct RowView: View {
             stopButton
         }
         .padding(10)
-        .background(.primary.opacity(hovering ? 0.08 : 0.04), in: RoundedRectangle(cornerRadius: 10))
-        .contentShape(RoundedRectangle(cornerRadius: 10))
-        .onHover { hovering = $0 }
-        .onTapGesture { listener.mainPorts.first.map(Localhost.open) }
-        .help(listener.mainPorts.first.map { "Click to open " + Localhost.url($0) } ?? "")
+        .background(.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
     }
 
     @ViewBuilder
