@@ -6,6 +6,7 @@ struct TintedButton: View {
     let tint: Color
     var filled = false
     var quiet = false
+    var idleTint: Color?
     let help: String
     let action: () -> Void
     @State private var hovering = false
@@ -16,7 +17,7 @@ struct TintedButton: View {
                 Image(systemName: symbol).font(.system(size: title == nil ? 11 : 10, weight: .bold))
                 if let title { Text(title).font(.system(size: 11, weight: .semibold)) }
             }
-            .foregroundStyle(filled || (hovering && title == nil) ? Color.white : tint)
+            .foregroundStyle(foreground)
             .frame(width: title == nil ? 24 : nil, height: 24)
             .padding(.horizontal, title == nil ? 0 : 10)
             .background(background, in: RoundedRectangle(cornerRadius: title == nil ? 12 : 7))
@@ -28,6 +29,11 @@ struct TintedButton: View {
         .accessibilityLabel(title ?? help)
         .animation(.easeOut(duration: 0.12), value: hovering)
         .animation(.easeOut(duration: 0.12), value: filled)
+    }
+
+    private var foreground: Color {
+        if filled || (hovering && title == nil) { return .white }
+        return hovering ? tint : idleTint ?? tint
     }
 
     private var background: Color {
@@ -44,7 +50,7 @@ struct StopAllButton: View {
 
     var body: some View {
         TintedButton(title: confirming ? "Stop \(count == 1 ? "1 dev server" : "\(count) dev servers")?" : "Stop all",
-                     symbol: "stop.fill", tint: .red, filled: confirming, quiet: true,
+                     symbol: "stop.fill", tint: .red, filled: confirming, quiet: true, idleTint: .secondary,
                      help: confirming ? "Click again to stop every dev server" : "Stop every dev server") {
             if confirming {
                 confirming = false

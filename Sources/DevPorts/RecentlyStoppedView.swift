@@ -44,7 +44,7 @@ private struct StoppedRow: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(tint.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+        .background(background, in: RoundedRectangle(cornerRadius: 10))
         .animation(.easeOut(duration: 0.2), value: server.state)
         .accessibilityElement(children: .contain)
     }
@@ -76,13 +76,8 @@ private struct StoppedRow: View {
         }
     }
 
-    private var tint: Color {
-        switch server.state {
-        case .stopped: .orange
-        case .starting: .gray
-        case .running: .green
-        case .failed: .red
-        }
+    private var background: Color {
+        server.isFailed ? Color.red.opacity(0.08) : Color.primary.opacity(0.05)
     }
 
     @ViewBuilder
@@ -92,7 +87,8 @@ private struct StoppedRow: View {
             restartButton
             forgetButton
         case .failed:
-            TintedButton(title: "Open log", symbol: "doc.text", tint: .blue, help: "Open \(server.log.lastPathComponent)") {
+            TintedButton(title: "Open log", symbol: "doc.text", tint: .blue, quiet: true,
+                         help: "Open \(server.log.lastPathComponent)") {
                 NSWorkspace.shared.open(server.log)
             }
             restartButton

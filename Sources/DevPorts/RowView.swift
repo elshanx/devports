@@ -62,7 +62,8 @@ struct RowView: View {
         if stopping {
             ProgressView().controlSize(.small).frame(width: 24, height: 24)
         } else if !Project.isProtected(command: listener.command) || listener.container != nil {
-            TintedButton(symbol: "stop.fill", tint: .red, help: "Stop \(listener.name) (⌘⌫ when selected)",
+            TintedButton(symbol: "stop.fill", tint: .red, quiet: true, idleTint: .secondary,
+                         help: "Stop \(listener.name) (⌘⌫ when selected)",
                          action: onStop)
         } else {
             Image(systemName: "lock.fill")
