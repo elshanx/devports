@@ -38,6 +38,7 @@ struct ContentView: View {
         }
         .frame(width: 400)
         .fixedSize(horizontal: false, vertical: true)
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 
     private var header: some View {
