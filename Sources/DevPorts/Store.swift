@@ -54,6 +54,8 @@ final class Store {
     }
 
     func restart(_ server: StoppedServer) {
+        guard let current = recentlyStopped.first(where: { $0.id == server.id }),
+              current.state == .stopped || current.isFailed else { return }
         do {
             _ = try server.spec.launch(logTo: server.log)
             setState(.starting(since: Date()), for: server.id)
@@ -97,7 +99,9 @@ final class Store {
         recentlyStopped[index].state = state
     }
 
-    private func stopAll(_ targets: [Listener]) {
+    private func stopAll(_ requested: [Listener]) {
+        let targets = requested.filter { !stopping.contains($0.id) }
+        guard !targets.isEmpty else { return }
         stopping.formUnion(targets.map(\.id))
         Task {
             var errors: [String] = []

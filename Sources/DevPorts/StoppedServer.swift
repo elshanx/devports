@@ -21,6 +21,11 @@ struct StoppedServer: Identifiable {
         URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts/\(name).log")
     }
 
+    var isFailed: Bool {
+        if case .failed = state { return true }
+        return false
+    }
+
     var isStarting: Bool {
         if case .starting = state { return true }
         return false

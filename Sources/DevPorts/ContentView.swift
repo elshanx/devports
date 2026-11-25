@@ -117,6 +117,8 @@ struct ContentView: View {
             } else {
                 Label(store.query, systemImage: "magnifyingglass")
                     .font(.caption.monospaced())
+                    .lineLimit(1)
+                    .truncationMode(.head)
                     .foregroundStyle(Color.accentColor)
                     .accessibilityLabel("Filter: " + store.query)
                     .help("Filter. Press Esc to clear.")

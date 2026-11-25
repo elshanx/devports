@@ -37,6 +37,7 @@ private struct StoppedRow: View {
                     .font(.system(size: 10, design: server.state == .stopped ? .monospaced : .default))
                     .foregroundStyle(detailColor)
                     .lineLimit(1)
+                    .help(detail)
             }
             Spacer(minLength: 0)
             actions
