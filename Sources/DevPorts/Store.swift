@@ -70,6 +70,11 @@ final class Store {
         }
     }
 
+    func restartLatest() {
+        guard let server = recentlyStopped.first(where: { $0.state == .stopped || $0.isFailed }) else { return }
+        restart(server)
+    }
+
     func dismissMessage() {
         message = nil
         adminCommand = nil

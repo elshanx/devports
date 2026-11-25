@@ -52,7 +52,9 @@ final class RestartTests: XCTestCase {
         let stopped = try await waitFor { store.recentlyStopped.first }
         XCTAssertEqual(stopped.kind, .other)
 
-        store.restart(stopped)
+        store.restartLatest()
+        store.restartLatest()
+        XCTAssertTrue(store.recentlyStopped.first?.isStarting ?? false)
         _ = try await waitFor { store.recentlyStopped.first { $0.state == .running(port: 47131) } }
         if let restarted = Scanner.scan().first(where: { $0.ports.contains(47131) }) { kill(-restarted.pgid, SIGKILL) }
     }

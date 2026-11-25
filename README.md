@@ -76,6 +76,7 @@ DevPorts answers one question: what is running on my machine, and where? Click t
 | <kbd>↑</kbd> <kbd>↓</kbd> | Select a server |
 | <kbd>↩</kbd> or double-click | Open the main port in the browser |
 | <kbd>⌘</kbd><kbd>⌫</kbd> | Stop the selected server |
+| <kbd>⌘</kbd><kbd>Z</kbd> | Restart the last stopped server |
 | Type | Filter by name, folder or port |
 | <kbd>Esc</kbd> | Clear the filter, or close the popover |
 | <kbd>⌘</kbd><kbd>R</kbd> | Refresh |
@@ -107,7 +108,7 @@ The "…" menu lists these keys, so you never have to remember them.
 3. Restart from the captured `argv`, then through the login shell after restarts failed without `nvm` in `PATH`.
 4. Hidden ports, after one Astro server showed six ports.
 5. App icon, open at login, coloured footer buttons.
-6. Eight design critiques with the Impeccable skill. The design health score went **25 → 28 → 31 → 32 → 34 → 40 → 38 → 40** out of 40. Each fix is its own commit.
+6. Nine design critiques with the Impeccable skill. The design health score went **25 → 28 → 31 → 32 → 34 → 40 → 38 → 40 → 38** out of 40. Each fix is its own commit.
 
 ### Decisions reconsidered
 
@@ -134,7 +135,6 @@ The app was built with Claude Code in one long session. Every change was small, 
 
 - The hotkey is fixed to <kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd>. If another app uses it, DevPorts does not tell you.
 - "Copy command" copies `sudo kill <pid>`, which stops the main process but not its child processes.
-- Restart has no keyboard shortcut yet; <kbd>⌘</kbd><kbd>Z</kbd> is planned.
 - Restarts run through your login shell, not with the original environment variables.
 - Some tools (for example `astro dev` in background mode) detach from the terminal, so the restart log shows little output.
 - The app is signed ad hoc, not notarized. On another Mac, Gatekeeper asks for confirmation the first time.

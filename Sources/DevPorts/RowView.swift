@@ -16,7 +16,7 @@ struct RowView: View {
         .padding(.vertical, listener.kind == .other ? 6 : 10)
         .background(selected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.05),
                     in: RoundedRectangle(cornerRadius: 10))
-        .help(listener.opensInBrowser ? "Double-click to open " + Localhost.url(listener.mainPorts.first ?? 0) : "")
+        .help(selected && listener.opensInBrowser ? "Double-click or press Return to open " + Localhost.url(listener.mainPorts.first ?? 0) : "")
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
@@ -62,7 +62,7 @@ struct RowView: View {
         if stopping {
             ProgressView().controlSize(.small).frame(width: 24, height: 24)
         } else if !Project.isProtected(command: listener.command) || listener.container != nil {
-            TintedButton(symbol: "stop.fill", tint: .red, quiet: true, idleTint: .secondary,
+            TintedButton(symbol: "stop.fill", tint: .red, idleTint: .gray,
                          help: "Stop \(listener.name) (⌘⌫ when selected)",
                          action: onStop)
         } else {

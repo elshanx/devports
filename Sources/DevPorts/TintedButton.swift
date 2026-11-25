@@ -39,7 +39,7 @@ struct TintedButton: View {
     private var background: Color {
         if filled { return tint }
         if hovering { return title == nil ? tint : tint.opacity(0.25) }
-        return quiet ? .clear : tint.opacity(0.14)
+        return quiet ? .clear : (idleTint ?? tint).opacity(0.14)
     }
 }
 
@@ -50,7 +50,7 @@ struct StopAllButton: View {
 
     var body: some View {
         TintedButton(title: confirming ? "Stop \(count == 1 ? "1 dev server" : "\(count) dev servers")?" : "Stop all",
-                     symbol: "stop.fill", tint: .red, filled: confirming, quiet: true, idleTint: .secondary,
+                     symbol: "stop.fill", tint: .red, filled: confirming, quiet: true, idleTint: .primary.opacity(0.75),
                      help: confirming ? "Click again to stop every dev server" : "Stop every dev server") {
             if confirming {
                 confirming = false

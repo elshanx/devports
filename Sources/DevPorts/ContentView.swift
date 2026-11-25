@@ -108,11 +108,7 @@ struct ContentView: View {
         HStack(alignment: .firstTextBaseline) {
             Text("DevPorts").font(.system(size: 13, weight: .bold))
             Spacer()
-            if store.query.isEmpty && store.showAll {
-                Label("Type to filter", systemImage: "magnifyingglass")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else if store.query.isEmpty {
+            if store.query.isEmpty {
                 Text(summary).font(.caption).foregroundStyle(.secondary)
             } else {
                 Label(store.query, systemImage: "magnifyingglass")
@@ -127,11 +123,10 @@ struct ContentView: View {
     }
 
     private var summary: String {
-        switch store.devServers.count {
-        case 0: "No dev servers running"
-        case 1: "1 dev server running"
-        case let count: "\(count) dev servers running"
-        }
+        let count = store.devServers.count
+        let running = count == 1 ? "1 dev server running" : "\(count == 0 ? "No" : String(count)) dev servers running"
+        if store.showAll { return "Type to filter" }
+        return count > 1 ? running + " · Type to filter" : running
     }
 
     private var emptyText: String {

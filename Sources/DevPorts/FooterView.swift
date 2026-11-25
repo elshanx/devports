@@ -36,6 +36,7 @@ private struct MoreMenu: View {
                 Text("↑ ↓  Select a server")
                 Text("↩ or double-click  Open in browser")
                 Text("⌘⌫  Stop selected server")
+                Text("⌘Z  Restart last stopped server")
                 Text("Type  Filter by name, folder or port")
                 Text("Esc  Clear the filter or close")
             }
