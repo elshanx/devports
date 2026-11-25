@@ -3,6 +3,7 @@ import Foundation
 struct StopResult {
     var error: String?
     var restart: LaunchSpec?
+    var needsAdmin = false
 }
 
 enum Killer {
@@ -21,7 +22,8 @@ enum Killer {
         let target = killsGroup ? -listener.pgid : listener.pid
         let restart = restartSpec(leader: killsGroup ? listener.pgid : listener.pid, fallbackFolder: listener.folder)
         if kill(target, SIGTERM) != 0 {
-            return StopResult(error: errno == EPERM ? "Could not stop \(listener.name). You do not have permission to stop it." : nil)
+            guard errno == EPERM else { return StopResult() }
+            return StopResult(error: "Could not stop \(listener.name). It needs administrator rights.", needsAdmin: true)
         }
         for _ in 0..<30 {
             try? await Task.sleep(for: .milliseconds(100))

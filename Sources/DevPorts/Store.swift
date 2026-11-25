@@ -10,7 +10,7 @@ final class Store {
     var showRandomPorts = false
     var stopping = Set<String>()
     var message: String?
-    private(set) var failedStops: [Listener] = []
+    private(set) var adminCommand: String?
     private var timer: Timer?
     private var isScanning = false
 
@@ -68,15 +68,9 @@ final class Store {
         }
     }
 
-    func retryFailedStops() {
-        let targets = failedStops
-        dismissMessage()
-        stopAll(targets)
-    }
-
     func dismissMessage() {
         message = nil
-        failedStops = []
+        adminCommand = nil
     }
 
     func forget(_ server: StoppedServer) {
@@ -107,20 +101,18 @@ final class Store {
         stopping.formUnion(targets.map(\.id))
         Task {
             var errors: [String] = []
-            var failed: [Listener] = []
+            var adminPids: [Int32] = []
             await withTaskGroup(of: (Listener, StopResult).self) { group in
                 for target in targets { group.addTask { (target, await Killer.stop(target)) } }
                 for await (target, result) in group {
-                    if let error = result.error {
-                        errors.append(error)
-                        failed.append(target)
-                    }
+                    if let error = result.error { errors.append(error) }
+                    if result.needsAdmin { adminPids.append(target.pid) }
                     if let spec = result.restart { remember(target, spec) }
                 }
             }
             stopping.subtract(targets.map(\.id))
             message = errors.isEmpty ? nil : errors.joined(separator: "\n")
-            failedStops = failed
+            adminCommand = adminPids.isEmpty ? nil : "sudo kill " + adminPids.map(String.init).joined(separator: " ")
             refresh()
         }
     }

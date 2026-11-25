@@ -32,13 +32,14 @@ struct ContentView: View {
             .frame(maxHeight: 460)
             .fixedSize(horizontal: false, vertical: true)
             if let message = store.message {
-                ErrorBanner(message: message, retryTitle: "Try again", retry: store.retryFailedStops,
-                            dismiss: store.dismissMessage)
+                ErrorBanner(message: message, actionTitle: store.adminCommand.map { _ in "Copy command" },
+                            action: copyAdminCommand, dismiss: store.dismissMessage,
+                            actionHelp: store.adminCommand.map { "Copies \u{201C}\($0)\u{201D}. Paste it in Terminal." })
                     .padding(.horizontal, 12)
                     .padding(.bottom, 8)
             } else if let error = loginItem.error {
-                ErrorBanner(message: error, retryTitle: "Open Settings", retry: loginItem.openSettings,
-                            dismiss: loginItem.dismissError)
+                ErrorBanner(message: error, actionTitle: "Open Settings", action: loginItem.openSettings,
+                            dismiss: loginItem.dismissError, symbol: "gear", doneTitle: nil)
                     .padding(.horizontal, 12)
                     .padding(.bottom, 8)
             }
@@ -81,6 +82,12 @@ struct ContentView: View {
     private func filter(_ query: String) {
         store.query = query
         selection = query.isEmpty ? nil : store.ordered.first?.id
+    }
+
+    private func copyAdminCommand() {
+        guard let command = store.adminCommand else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(command, forType: .string)
     }
 
     private func moveSelection(by step: Int) -> KeyPress.Result {
