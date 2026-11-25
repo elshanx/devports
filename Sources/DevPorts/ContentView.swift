@@ -15,9 +15,6 @@ struct ContentView: View {
                     } else {
                         sections
                     }
-                    if !store.devServers.isEmpty {
-                        StopAllButton(count: store.devServers.count) { store.stopAllDevServers() }
-                    }
                     if !store.recentlyStopped.isEmpty {
                         RecentlyStoppedView(store: store)
                     }
@@ -34,7 +31,7 @@ struct ContentView: View {
                     .padding(.bottom, 8)
             }
             Divider()
-            footer.padding(.horizontal, 14).padding(.vertical, 10)
+            FooterView(store: store, loginItem: loginItem).padding(.horizontal, 14).padding(.vertical, 10)
         }
         .frame(width: 400)
         .fixedSize(horizontal: false, vertical: true)
@@ -84,26 +81,5 @@ struct ContentView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 18)
-    }
-
-    private var footer: some View {
-        HStack(spacing: 8) {
-            TintedButton(title: store.showAll ? "Show dev ports" : "Show all ports",
-                         symbol: store.showAll ? "hammer" : "list.bullet", tint: .accentColor,
-                         help: "Switch between dev servers and every port") { store.showAll.toggle() }
-            Spacer()
-            TintedButton(symbol: "doc.text", tint: .blue, help: "Open restart logs") {
-                let logs = URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts")
-                try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
-                NSWorkspace.shared.open(logs)
-            }
-            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh") { store.refresh() }
-            TintedButton(symbol: loginItem.isEnabled ? "sunrise.fill" : "sunrise",
-                         tint: loginItem.isEnabled ? .purple : .gray,
-                         help: loginItem.isEnabled ? "Opens at login (click to turn off)" : "Open at login (off)") {
-                loginItem.toggle()
-            }
-            TintedButton(symbol: "power", tint: .orange, help: "Quit DevPorts") { NSApplication.shared.terminate(nil) }
-        }
     }
 }

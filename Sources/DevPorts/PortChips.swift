@@ -13,7 +13,7 @@ struct PortChips: View {
             if !internalPorts.isEmpty {
                 Text("+\(internalPorts.count) internal")
                     .font(.system(size: 10))
-                    .foregroundStyle(.tertiary)
+                    .foregroundStyle(.secondary)
                     .padding(.vertical, 3)
                     .help("Internal ports (debugger or random ports from the tool): "
                         + internalPorts.map { ":" + String($0) }.joined(separator: " "))

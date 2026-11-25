@@ -9,9 +9,12 @@ struct RowView: View {
     var body: some View {
         HStack(alignment: .top, spacing: 10) {
             KindTile(kind: listener.kind)
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(listener.name).font(.system(size: 13, weight: .semibold)).lineLimit(1)
+                    Text(listener.name)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(1)
+                        .help(listener.name + "\n" + listener.command)
                     if let folder = listener.folder {
                         Button(abbreviated(folder)) { NSWorkspace.shared.open(URL(fileURLWithPath: folder)) }
                             .buttonStyle(.plain)
@@ -22,11 +25,6 @@ struct RowView: View {
                             .help("Show in Finder")
                     }
                 }
-                Text(listener.command)
-                    .font(.system(size: 10, design: .monospaced))
-                    .foregroundStyle(.tertiary)
-                    .lineLimit(1)
-                    .truncationMode(.middle)
                 PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
             }
             Spacer(minLength: 0)
