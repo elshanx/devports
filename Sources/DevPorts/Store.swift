@@ -7,11 +7,13 @@ final class Store {
     var listeners: [Listener] = []
     var recentlyStopped: [StoppedServer] = []
     var showAll = false
+    var showRandomPorts = false
     var stopping = Set<String>()
     var message: String?
     private var timer: Timer?
 
-    var visible: [Listener] { showAll ? listeners : devServers }
+    var visible: [Listener] { showAll ? listeners.filter { showRandomPorts || !$0.onRandomPortsOnly } : devServers }
+    var randomPortApps: [Listener] { listeners.filter(\.onRandomPortsOnly) }
     var devServers: [Listener] { listeners.filter { $0.kind == .dev } }
 
     init() {

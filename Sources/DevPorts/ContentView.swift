@@ -21,6 +21,9 @@ struct ContentView: View {
                         } else {
                             sections
                         }
+                        if store.showAll, !store.randomPortApps.isEmpty {
+                            randomPortsToggle
+                        }
                         if !store.recentlyStopped.isEmpty {
                             RecentlyStoppedView(store: store)
                         }
@@ -112,6 +115,16 @@ struct ContentView: View {
                     }
                 }
             }
+        }
+    }
+
+    private var randomPortsToggle: some View {
+        let count = store.randomPortApps.count
+        let apps = count == 1 ? "1 app on a random port" : "\(count) apps on random ports"
+        return TintedButton(title: (store.showRandomPorts ? "Hide " : "Show ") + apps,
+                            symbol: store.showRandomPorts ? "chevron.up" : "chevron.down", tint: .secondary, quiet: true,
+                            help: "Apps that listen only on ports above 49152, picked at random by the system") {
+            store.showRandomPorts.toggle()
         }
     }
 

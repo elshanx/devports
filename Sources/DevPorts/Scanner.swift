@@ -21,6 +21,8 @@ struct Listener: Identifiable, Hashable {
 
     var internalPorts: [Int] { ports.filter { !mainPorts.contains($0) } }
 
+    var onRandomPortsOnly: Bool { kind == .other && ports.allSatisfy(Self.isInternal) }
+
     private static func isInternal(_ port: Int) -> Bool {
         port >= 49152 || [9229, 9230].contains(port)
     }

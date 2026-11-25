@@ -145,6 +145,8 @@ final class DevPortsTests: XCTestCase {
                                   ports: [61541], kind: .other, container: nil)
         XCTAssertEqual(onlyRandom.mainPorts, [61541])
         XCTAssertEqual(onlyRandom.internalPorts, [])
+        XCTAssertTrue(onlyRandom.onRandomPortsOnly)
+        XCTAssertFalse(astro.onRandomPortsOnly)
     }
 
     func testSystemListenersAreNotDevServers() {
