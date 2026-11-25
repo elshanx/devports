@@ -10,7 +10,8 @@ enum Killer {
         if let container = listener.container {
             guard let docker = DockerReader.path else { return StopResult(error: "Could not stop \(listener.name). The docker command is not installed.") }
             Shell.run(docker, ["stop", container])
-            return StopResult()
+            return StopResult(restart: LaunchSpec(executable: docker, arguments: ["docker", "start", container],
+                                                  folder: Project.home))
         }
         guard !Project.isProtected(command: listener.command) else {
             return StopResult(error: "\(listener.name) is protected")
@@ -18,8 +19,7 @@ enum Killer {
         guard Scanner.isListening(pid: listener.pid) else { return StopResult() }
         let killsGroup = canKillGroup(listener)
         let target = killsGroup ? -listener.pgid : listener.pid
-        let restart = listener.kind == .dev ? restartSpec(leader: killsGroup ? listener.pgid : listener.pid,
-                                                          fallbackFolder: listener.folder) : nil
+        let restart = restartSpec(leader: killsGroup ? listener.pgid : listener.pid, fallbackFolder: listener.folder)
         if kill(target, SIGTERM) != 0 {
             return StopResult(error: errno == EPERM ? "Could not stop \(listener.name). You do not have permission to stop it." : nil)
         }

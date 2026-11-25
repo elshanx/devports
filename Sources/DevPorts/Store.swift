@@ -106,7 +106,7 @@ final class Store {
 
     private func remember(_ listener: Listener, _ spec: LaunchSpec) {
         recentlyStopped.removeAll { $0.spec == spec }
-        recentlyStopped.insert(StoppedServer(name: listener.name, ports: listener.mainPorts, spec: spec), at: 0)
+        recentlyStopped.insert(StoppedServer(name: listener.name, kind: listener.kind, ports: listener.mainPorts, spec: spec), at: 0)
         recentlyStopped = Array(recentlyStopped.prefix(5))
     }
 }

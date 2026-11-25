@@ -12,6 +12,7 @@ struct StoppedServer: Identifiable {
 
     let id = UUID()
     let name: String
+    let kind: Listener.Kind
     let ports: [Int]
     let spec: LaunchSpec
     var state = State.stopped
@@ -27,7 +28,7 @@ struct StoppedServer: Identifiable {
 
     func runningListener(in listeners: [Listener]) -> Listener? {
         listeners.first { listener in
-            listener.kind == .dev
+            listener.kind == kind && listener.name == name
                 && (!Set(listener.mainPorts).isDisjoint(with: ports) || listener.folder == spec.folder)
         }
     }
