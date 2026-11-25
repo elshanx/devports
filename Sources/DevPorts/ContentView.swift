@@ -118,7 +118,7 @@ struct ContentView: View {
     private var emptyState: some View {
         VStack(spacing: 6) {
             Image(systemName: "moon.zzz.fill").font(.system(size: 22)).foregroundStyle(.tertiary)
-            Text(store.showAll ? "No ports in use" : "No dev servers running")
+            Text(store.showAll ? "No ports in use" : "Dev servers you start show here")
                 .font(.callout)
                 .foregroundStyle(.secondary)
         }

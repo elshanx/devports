@@ -6,7 +6,7 @@ struct FooterView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            TintedButton(title: store.showAll ? "Show dev ports" : "Show all ports",
+            TintedButton(title: store.showAll ? "Show dev servers" : "Show all ports",
                          symbol: store.showAll ? "hammer" : "list.bullet", tint: .accentColor, quiet: true,
                          help: "Switch between dev servers and every port") { store.showAll.toggle() }
             if !store.devServers.isEmpty {
@@ -24,7 +24,7 @@ private struct MoreMenu: View {
 
     var body: some View {
         Menu {
-            Button("Refresh Now") { store.refresh() }.keyboardShortcut("r")
+            Button("Refresh") { store.refresh() }.keyboardShortcut("r")
             Button("Open Restart Logs") {
                 let logs = URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts")
                 try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)

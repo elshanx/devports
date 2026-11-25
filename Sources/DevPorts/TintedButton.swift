@@ -43,7 +43,7 @@ struct StopAllButton: View {
     @State private var confirming = false
 
     var body: some View {
-        TintedButton(title: confirming ? "Stop \(count == 1 ? "1 server" : "\(count) servers")?" : "Stop all",
+        TintedButton(title: confirming ? "Stop \(count == 1 ? "1 dev server" : "\(count) dev servers")?" : "Stop all",
                      symbol: "stop.fill", tint: .red, filled: confirming, quiet: true,
                      help: confirming ? "Click again to stop every dev server" : "Stop every dev server") {
             if confirming {

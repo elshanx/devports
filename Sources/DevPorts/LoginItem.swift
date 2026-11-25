@@ -28,7 +28,7 @@ final class LoginItem {
             }
             error = nil
         } catch {
-            self.error = "Could not change Open at login: \(error.localizedDescription)"
+            self.error = "Could not change Open at Login: \(error.localizedDescription)"
         }
         let status = SMAppService.mainApp.status
         isEnabled = status == .enabled

@@ -8,7 +8,7 @@ struct StopResult {
 enum Killer {
     static func stop(_ listener: Listener) async -> StopResult {
         if let container = listener.container {
-            guard let docker = DockerReader.path else { return StopResult(error: "Docker CLI not found") }
+            guard let docker = DockerReader.path else { return StopResult(error: "Could not stop \(listener.name). The docker command is not installed.") }
             Shell.run(docker, ["stop", container])
             return StopResult()
         }
@@ -21,7 +21,7 @@ enum Killer {
         let restart = listener.kind == .dev ? restartSpec(leader: killsGroup ? listener.pgid : listener.pid,
                                                           fallbackFolder: listener.folder) : nil
         if kill(target, SIGTERM) != 0 {
-            return StopResult(error: errno == EPERM ? "No permission to stop \(listener.name)" : nil)
+            return StopResult(error: errno == EPERM ? "Could not stop \(listener.name). You do not have permission to stop it." : nil)
         }
         for _ in 0..<30 {
             try? await Task.sleep(for: .milliseconds(100))

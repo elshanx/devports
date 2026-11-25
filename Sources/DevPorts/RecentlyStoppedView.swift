@@ -109,6 +109,6 @@ private struct StoppedRow: View {
     }
 
     private var forgetButton: some View {
-        TintedButton(symbol: "xmark", tint: .gray, help: "Forget \(server.name)") { store.forget(server) }
+        TintedButton(symbol: "xmark", tint: .gray, help: "Remove \(server.name) from this list") { store.forget(server) }
     }
 }

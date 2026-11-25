@@ -66,10 +66,12 @@ struct RowView: View {
                 .font(.system(size: 10))
                 .foregroundStyle(.secondary)
                 .frame(width: 24, height: 24)
-                .help("System process. DevPorts does not stop it.")
-                .accessibilityLabel("System process. DevPorts does not stop it.")
+                .help(protectedHelp)
+                .accessibilityLabel(protectedHelp)
         }
     }
+
+    private let protectedHelp = "DevPorts does not stop apps or system processes. Quit it from the app."
 
     private func abbreviated(_ path: String) -> String {
         path.hasPrefix(Project.home) ? "~" + path.dropFirst(Project.home.count) : path
