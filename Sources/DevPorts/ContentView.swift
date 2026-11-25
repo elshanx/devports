@@ -52,7 +52,7 @@ struct ContentView: View {
         .focusEffectDisabled()
         .onKeyPress(.downArrow) { moveSelection(by: 1) }
         .onKeyPress(.upArrow) { moveSelection(by: -1) }
-        .onKeyPress(.return) { act { listener in if listener.kind != .other { listener.mainPorts.first.map(Localhost.open) } } }
+        .onKeyPress(.return) { act(openMainPort) }
         .onKeyPress(.delete, phases: .down) { press in
             press.modifiers.contains(.command) ? act { store.stop($0) } : .ignored
         }
@@ -76,6 +76,11 @@ struct ContentView: View {
         let current = selection.flatMap { ids.firstIndex(of: $0) } ?? (step > 0 ? -1 : ids.count)
         selection = ids[min(max(current + step, 0), ids.count - 1)]
         return .handled
+    }
+
+    private func openMainPort(_ listener: Listener) {
+        guard listener.kind != .other, let port = listener.mainPorts.first else { return }
+        Localhost.open(port)
     }
 
     private func act(_ action: (Listener) -> Void) -> KeyPress.Result {
@@ -112,6 +117,12 @@ struct ContentView: View {
                             store.stop(listener)
                         }
                         .id(listener.id)
+                        .contentShape(Rectangle())
+                        .onTapGesture(count: 2) { openMainPort(listener) }
+                        .onTapGesture {
+                            selection = listener.id
+                            listFocused = true
+                        }
                     }
                 }
             }
