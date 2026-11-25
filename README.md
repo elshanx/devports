@@ -8,7 +8,7 @@ A macOS menu bar app that shows which dev servers run on which ports, and stops,
 
 ## Overview
 
-DevPorts answers one question: what is running on my machine, and where? Click the menu bar icon (or press ⌥⌘P from any app) to see every dev server with its project folder and its ports. Open a port in the browser, stop one server, or stop all of them. A stop you regret is one click away from a restart. A second view shows every listening port, including Docker containers and system apps.
+DevPorts answers one question: what is running on my machine, and where? Click the menu bar icon (or press <kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd> from any app) to see every dev server with its project folder and its ports. Open a port in the browser, stop one server, or stop all of them. A stop you regret is one click away from a restart. A second view shows every listening port, including Docker containers and system apps.
 
 ### Tech Stack
 
@@ -33,7 +33,7 @@ DevPorts answers one question: what is running on my machine, and where? Click t
 
 - A dev server is a process that listens on a TCP port and runs in a project folder: a folder with `package.json`, `.git`, `Cargo.toml`, `go.mod`, `pyproject.toml` or `Gemfile`.
 - Processes in the same process group and folder merge into one row, so `pnpm dev` and the `node` child it starts show as one server.
-- Ports above 49152 and the Node debugger ports (9229, 9230) are "hidden". A row shows the main port and a quiet "+3 hidden".
+- Ports above `49152` and the Node debugger ports (`9229`, `9230`) are "hidden". A row shows the main port and a quiet "+3 hidden".
 - A tool that runs inside a project folder but listens only on a random port is not a dev server. It moves to "Other".
 - The default view shows only dev servers. "Show all ports" adds Docker containers and other processes. Apps that listen only on random ports are folded into one "Show 8 apps on random ports" line.
 
@@ -45,7 +45,7 @@ DevPorts answers one question: what is running on my machine, and where? Click t
 
 **My approach:**
 
-- DevPorts sends SIGTERM to the whole process group, then SIGKILL after 3 seconds if the group is still alive.
+- DevPorts sends `SIGTERM` to the whole process group, then `SIGKILL` after 3 seconds if the group is still alive.
 - It stops a group only if the group is not DevPorts' own group, not the terminal session, and has no protected member.
 - Processes under `/System`, `/usr/libexec`, `/usr/sbin`, `/sbin`, `/Applications` and `~/Library/Application Support` are protected. They show a lock with the reason instead of a stop button. (Xcode's own tools are an exception.)
 - Docker rows stop the container with `docker stop`.
@@ -59,10 +59,10 @@ DevPorts answers one question: what is running on my machine, and where? Click t
 
 **My approach:**
 
-- Before a stop, DevPorts reads the exact argv of the process group leader with `sysctl(KERN_PROCARGS2)` and its working folder with `lsof`.
+- Before a stop, DevPorts reads the exact `argv` of the process group leader with `sysctl(KERN_PROCARGS2)` and its working folder with `lsof`.
 - A stopped server moves to "Recently stopped" (the last 5) with a Restart button.
 - Restart runs the same command in the same folder through your login shell, so `nvm`, `pnpm` and your `PATH` work. (macOS hides other processes' environment, so it cannot be copied.)
-- The row shows "Starting…", then "Running on :3000", or "Did not start" with the reason, "Open log" and "Retry".
+- The row shows "Starting…", then "Running on `:3000`", or "Did not start" with the reason, "Open log" and "Retry".
 - Each restart writes a log to `~/Library/Logs/DevPorts/<name>.log` that starts with the date, the folder and the command.
 - Docker containers restart with `docker start`. Other unprotected processes restart like dev servers.
 
@@ -70,24 +70,24 @@ DevPorts answers one question: what is running on my machine, and where? Click t
 
 ### Keyboard
 
-| Key                   | Action                                    |
-| --------------------- | ----------------------------------------- |
-| ⌥⌘P                   | Open DevPorts from any app                |
-| ↑ ↓                   | Select a server                           |
-| ↩ or double-click     | Open the main port in the browser         |
-| ⌘⌫                    | Stop the selected server                  |
-| Type                  | Filter by name, folder or port            |
-| Esc                   | Clear the filter, or close the popover    |
-| ⌘R                    | Refresh                                   |
-| ⌘Q                    | Quit                                      |
+| Key | Action |
+| --- | --- |
+| <kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd> | Open DevPorts from any app |
+| <kbd>↑</kbd> <kbd>↓</kbd> | Select a server |
+| <kbd>↩</kbd> or double-click | Open the main port in the browser |
+| <kbd>⌘</kbd><kbd>⌫</kbd> | Stop the selected server |
+| Type | Filter by name, folder or port |
+| <kbd>Esc</kbd> | Clear the filter, or close the popover |
+| <kbd>⌘</kbd><kbd>R</kbd> | Refresh |
+| <kbd>⌘</kbd><kbd>Q</kbd> | Quit |
 
 The "…" menu lists these keys, so you never have to remember them.
 
 ### Other design choices
 
 - **One action per click area:** a port chip opens the port, the folder opens Finder, the stop button stops, and the card itself selects. "Other" rows show ports as plain labels, because ports like `:5432` do not serve web pages.
-- **Errors that help:** each error says what failed and why, and offers only an action that can work. A permission error offers "Copy command" with the `sudo kill` command, and never a "Try again" that would fail again.
-- **Focus:** the popover opens with no focus ring (Tab still shows one), and when it closes DevPorts hides so focus goes back to the app you were using.
+- **Errors that help:** each error says what failed and why, and offers only an action that can work. A permission error offers "Copy command" with the `sudo kill <pid>` command, and never a "Try again" that would fail again.
+- **Focus:** the popover opens with no focus ring (<kbd>Tab</kbd> still shows one), and when it closes DevPorts hides so focus goes back to the app you were using.
 - **Solid background:** the popover uses the window background colour, so it reads the same on any wallpaper.
 - **Open at login:** turned on at first launch with `SMAppService`, and switchable in the "…" menu.
 - **Accessibility:** VoiceOver labels on every icon button and port chip, the selected row announces itself, and status is never shown by colour alone.
@@ -104,7 +104,7 @@ The "…" menu lists these keys, so you never have to remember them.
 
 1. A first menu bar app with `MenuBarExtra`, replaced by `NSStatusItem` + `NSPopover` because the `MenuBarExtra` window would not shrink after "Show all ports".
 2. Process-group stopping and the protected list, after a test showed that stopping `pnpm` left its `node` child running.
-3. Restart from the captured argv, then through the login shell after restarts failed without `nvm` in `PATH`.
+3. Restart from the captured `argv`, then through the login shell after restarts failed without `nvm` in `PATH`.
 4. Hidden ports, after one Astro server showed six ports.
 5. App icon, open at login, coloured footer buttons.
 6. Eight design critiques with the Impeccable skill. The design health score went **25 → 28 → 31 → 32 → 34 → 40 → 38 → 40** out of 40. Each fix is its own commit.
@@ -112,9 +112,9 @@ The "…" menu lists these keys, so you never have to remember them.
 ### Decisions reconsidered
 
 - **Card click:** first it opened the main port. A critique found that one card had four different click results, so the card click was removed. Later the card got native list behaviour: click selects, double-click opens.
-- **Refresh button:** removed from the footer, because the list refreshes every 3 seconds. ⌘R and the "…" menu still refresh.
+- **Refresh button:** removed from the footer, because the list refreshes every 3 seconds. <kbd>⌘</kbd><kbd>R</kbd> and the "…" menu still refresh.
 - **"Try again" on errors:** replaced with "Copy command" for permission errors, because a second try could never work.
-- **A 40/40 score:** one self-review gave 40/40 too early. A fresh review found two real issues (lost focus after Esc, and the misleading "Try again"), and the score dropped to 38 until they were fixed.
+- **A 40/40 score:** one self-review gave 40/40 too early. A fresh review found two real issues (lost focus after <kbd>Esc</kbd>, and the misleading "Try again"), and the score dropped to 38 until they were fixed.
 
 ### What surprised me
 
@@ -132,9 +132,9 @@ The app was built with Claude Code in one long session. Every change was small, 
 
 ## Known Limitations
 
-- The hotkey is fixed to ⌥⌘P. If another app uses it, DevPorts does not tell you.
+- The hotkey is fixed to <kbd>⌥</kbd><kbd>⌘</kbd><kbd>P</kbd>. If another app uses it, DevPorts does not tell you.
 - "Copy command" copies `sudo kill <pid>`, which stops the main process but not its child processes.
-- Restart has no keyboard shortcut yet; ⌘Z is planned.
+- Restart has no keyboard shortcut yet; <kbd>⌘</kbd><kbd>Z</kbd> is planned.
 - Restarts run through your login shell, not with the original environment variables.
 - Some tools (for example `astro dev` in background mode) detach from the terminal, so the restart log shows little output.
 - The app is signed ad hoc, not notarized. On another Mac, Gatekeeper asks for confirmation the first time.
@@ -151,7 +151,7 @@ cd devports
 open DevPorts.app
 ```
 
-Tests: `swift test`. They start and stop real local servers on ports 47xxx.
+Tests: `swift test`. They start and stop real local servers on ports `47xxx`.
 
 To redraw the app icon:
 
