@@ -4,11 +4,12 @@ struct PortChips: View {
     let ports: [Int]
     let internalPorts: [Int]
     let tint: Color
+    var opensBrowser = true
 
     var body: some View {
         FlowLayout(spacing: 4) {
             ForEach(ports, id: \.self) { port in
-                PortChip(port: port, tint: tint)
+                PortChip(port: port, tint: tint, opensBrowser: opensBrowser)
             }
             if !internalPorts.isEmpty {
                 Text("+\(internalPorts.count) hidden")
@@ -25,21 +26,28 @@ struct PortChips: View {
 private struct PortChip: View {
     let port: Int
     let tint: Color
+    let opensBrowser: Bool
     @State private var hovering = false
 
     var body: some View {
-        Button { Localhost.open(port) } label: {
-            Text(":" + String(port))
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
-                .padding(.horizontal, 7)
-                .padding(.vertical, 2)
-                .foregroundStyle(tint)
-                .background(tint.opacity(hovering ? 0.25 : 0.12), in: Capsule())
+        if opensBrowser {
+            Button { Localhost.open(port) } label: { label }
+                .buttonStyle(.plain)
+                .onHover { hovering = $0 }
+                .help("Open " + Localhost.url(port))
+                .accessibilityLabel("Open port " + String(port))
+        } else {
+            label.accessibilityLabel("Port " + String(port))
         }
-        .buttonStyle(.plain)
-        .onHover { hovering = $0 }
-        .help("Open " + Localhost.url(port))
-        .accessibilityLabel("Open port " + String(port))
+    }
+
+    private var label: some View {
+        Text(":" + String(port))
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .padding(.horizontal, 7)
+            .padding(.vertical, 2)
+            .foregroundStyle(tint)
+            .background(tint.opacity(hovering ? 0.25 : 0.12), in: Capsule())
     }
 }
 

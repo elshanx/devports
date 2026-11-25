@@ -52,7 +52,7 @@ struct ContentView: View {
         .focusEffectDisabled()
         .onKeyPress(.downArrow) { moveSelection(by: 1) }
         .onKeyPress(.upArrow) { moveSelection(by: -1) }
-        .onKeyPress(.return) { act { $0.mainPorts.first.map(Localhost.open) } }
+        .onKeyPress(.return) { act { listener in if listener.kind != .other { listener.mainPorts.first.map(Localhost.open) } } }
         .onKeyPress(.delete, phases: .down) { press in
             press.modifiers.contains(.command) ? act { store.stop($0) } : .ignored
         }

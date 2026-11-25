@@ -27,7 +27,8 @@ struct RowView: View {
                 .lineLimit(1)
                 .help([listener.name, listener.folder.map(abbreviated), listener.command]
                     .compactMap { $0 }.joined(separator: "\n"))
-            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
+            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint,
+                      opensBrowser: false)
         }
     }
 
@@ -50,7 +51,8 @@ struct RowView: View {
                         .help("Show in Finder")
                 }
             }
-            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
+            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint,
+                      opensBrowser: false)
         }
     }
 
