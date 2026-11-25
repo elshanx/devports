@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     private let store = Store()
     private let loginItem = LoginItem()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -24,6 +24,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.sizingOptions = .preferredContentSize
         popover.contentViewController = controller
         popover.behavior = .transient
+        popover.delegate = self
         if let button = statusItem.button {
             button.image = NSImage(systemSymbolName: "network", accessibilityDescription: "DevPorts")
             button.imagePosition = .imageLeading
@@ -33,6 +34,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         showDevServerCount()
         hotKey = HotKey { [weak self] in self?.togglePopover() }
         loginItem.enableOnFirstLaunch()
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        NSApp.hide(nil)
     }
 
     @objc private func refresh() {
