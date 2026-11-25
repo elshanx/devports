@@ -7,15 +7,15 @@ struct RowView: View {
     let onStop: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            KindTile(kind: listener.kind)
+        HStack(alignment: .center, spacing: 10) {
+            if listener.kind != .other { KindTile(kind: listener.kind) }
             VStack(alignment: .leading, spacing: 6) {
                 VStack(alignment: .leading, spacing: 1) {
                     Text(listener.name)
                         .font(.system(size: 13, weight: .semibold))
                         .lineLimit(1)
                         .help(listener.name + "\n" + listener.command)
-                    if let folder = listener.folder {
+                    if let folder = listener.folder, folder != "/", folder != Project.home {
                         Button(abbreviated(folder)) { NSWorkspace.shared.open(URL(fileURLWithPath: folder)) }
                             .buttonStyle(.plain)
                             .font(.caption)
@@ -44,6 +44,13 @@ struct RowView: View {
         } else if !Project.isProtected(command: listener.command) || listener.container != nil {
             TintedButton(symbol: "stop.fill", tint: .red, help: "Stop \(listener.name) (⌘⌫ when selected)",
                          action: onStop)
+        } else {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 10))
+                .foregroundStyle(.tertiary)
+                .frame(width: 24, height: 24)
+                .help("System process. DevPorts does not stop it.")
+                .accessibilityLabel("System process. DevPorts does not stop it.")
         }
     }
 
@@ -78,7 +85,7 @@ extension Listener.Kind {
         switch self {
         case .dev: .green
         case .docker: .blue
-        case .other: .gray
+        case .other: .secondary
         }
     }
 
