@@ -11,6 +11,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
         let appMenu = NSMenu()
+        appMenu.addItem(withTitle: "Refresh", action: #selector(refresh), keyEquivalent: "r").target = self
         appMenu.addItem(withTitle: "Quit DevPorts", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         let appMenuItem = NSMenuItem()
         appMenuItem.submenu = appMenu
@@ -30,6 +31,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         showDevServerCount()
         loginItem.enableOnFirstLaunch()
+    }
+
+    @objc private func refresh() {
+        store.refresh()
     }
 
     @objc private func togglePopover() {

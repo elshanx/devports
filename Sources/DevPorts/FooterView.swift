@@ -13,18 +13,18 @@ struct FooterView: View {
                 StopAllButton(count: store.devServers.count) { store.stopAllDevServers() }
             }
             Spacer()
-            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh (⌘R)") { store.refresh() }
-                .keyboardShortcut("r")
-            MoreMenu(loginItem: loginItem)
+            MoreMenu(store: store, loginItem: loginItem)
         }
     }
 }
 
 private struct MoreMenu: View {
+    let store: Store
     let loginItem: LoginItem
 
     var body: some View {
         Menu {
+            Button("Refresh Now") { store.refresh() }.keyboardShortcut("r")
             Button("Open Restart Logs") {
                 let logs = URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts")
                 try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
@@ -35,7 +35,6 @@ private struct MoreMenu: View {
                 Text("↑ ↓  Select a server")
                 Text("↩  Open in browser")
                 Text("⌘⌫  Stop selected server")
-                Text("⌘R  Refresh")
                 Text("Esc  Close")
             }
             Divider()
