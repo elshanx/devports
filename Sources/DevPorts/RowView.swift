@@ -8,33 +8,50 @@ struct RowView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 10) {
-            if listener.kind != .other { KindTile(kind: listener.kind) }
-            VStack(alignment: .leading, spacing: 6) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(listener.name)
-                        .font(.system(size: 13, weight: .semibold))
-                        .lineLimit(1)
-                        .help(listener.name + "\n" + listener.command)
-                    if let folder = listener.folder, folder != "/", folder != Project.home {
-                        Button(abbreviated(folder)) { NSWorkspace.shared.open(URL(fileURLWithPath: folder)) }
-                            .buttonStyle(.plain)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                            .help("Show in Finder")
-                    }
-                }
-                PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
-            }
+            if listener.kind == .other { compact } else { full }
             Spacer(minLength: 0)
             stopButton
         }
-        .padding(10)
+        .padding(.horizontal, 10)
+        .padding(.vertical, listener.kind == .other ? 6 : 10)
         .background(selected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.05),
                     in: RoundedRectangle(cornerRadius: 10))
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private var compact: some View {
+        HStack(spacing: 8) {
+            Text(listener.name)
+                .font(.system(size: 12, weight: .medium))
+                .lineLimit(1)
+                .help([listener.name, listener.folder.map(abbreviated), listener.command]
+                    .compactMap { $0 }.joined(separator: "\n"))
+            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
+        }
+    }
+
+    @ViewBuilder
+    private var full: some View {
+        KindTile(kind: listener.kind)
+        VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 1) {
+                Text(listener.name)
+                    .font(.system(size: 13, weight: .semibold))
+                    .lineLimit(1)
+                    .help(listener.name + "\n" + listener.command)
+                if let folder = listener.folder, folder != "/", folder != Project.home {
+                    Button(abbreviated(folder)) { NSWorkspace.shared.open(URL(fileURLWithPath: folder)) }
+                        .buttonStyle(.plain)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                        .help("Show in Finder")
+                }
+            }
+            PortChips(ports: listener.mainPorts, internalPorts: listener.internalPorts, tint: listener.kind.tint)
+        }
     }
 
     @ViewBuilder
@@ -47,7 +64,7 @@ struct RowView: View {
         } else {
             Image(systemName: "lock.fill")
                 .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(.secondary)
                 .frame(width: 24, height: 24)
                 .help("System process. DevPorts does not stop it.")
                 .accessibilityLabel("System process. DevPorts does not stop it.")

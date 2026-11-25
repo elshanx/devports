@@ -11,11 +11,11 @@ struct PortChips: View {
                 PortChip(port: port, tint: tint)
             }
             if !internalPorts.isEmpty {
-                Text("+\(internalPorts.count) internal")
+                Text("+\(internalPorts.count) hidden")
                     .font(.system(size: 10))
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 3)
-                    .help("Internal ports (debugger or random ports from the tool): "
+                    .help("Hidden ports (debugger or random ports from the tool): "
                         + internalPorts.map { ":" + String($0) }.joined(separator: " "))
             }
         }
