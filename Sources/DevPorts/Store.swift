@@ -1,17 +1,6 @@
 import Foundation
 import Observation
 
-struct StoppedServer: Identifiable {
-    let id = UUID()
-    let name: String
-    let ports: [Int]
-    let spec: LaunchSpec
-
-    var log: URL {
-        URL(fileURLWithPath: Project.home).appendingPathComponent("Library/Logs/DevPorts/\(name).log")
-    }
-}
-
 @MainActor
 @Observable
 final class Store {
@@ -36,6 +25,7 @@ final class Store {
         Task {
             let result = await Task.detached { Scanner.scan() }.value
             listeners = result
+            trackRestarts()
         }
     }
 
@@ -48,18 +38,42 @@ final class Store {
     }
 
     func restart(_ server: StoppedServer) {
-        recentlyStopped.removeAll { $0.id == server.id }
         do {
             _ = try server.spec.launch(logTo: server.log)
-            message = nil
+            setState(.starting(since: Date()), for: server.id)
         } catch {
-            message = "Could not restart \(server.name): \(error.localizedDescription)"
+            setState(.failed(reason: error.localizedDescription), for: server.id)
         }
-        refresh()
+        Task {
+            while recentlyStopped.contains(where: { $0.id == server.id && $0.isStarting }) {
+                try? await Task.sleep(for: .seconds(1))
+                refresh()
+            }
+        }
     }
 
     func forget(_ server: StoppedServer) {
         recentlyStopped.removeAll { $0.id == server.id }
+    }
+
+    private func trackRestarts() {
+        for server in recentlyStopped {
+            guard case .starting(let since) = server.state else { continue }
+            if let listener = server.runningListener(in: listeners) {
+                setState(.running(port: listener.mainPorts.first), for: server.id)
+                Task {
+                    try? await Task.sleep(for: .seconds(4))
+                    forget(server)
+                }
+            } else if Date().timeIntervalSince(since) > StoppedServer.startTimeout {
+                setState(.failed(reason: "No port opened in \(Int(StoppedServer.startTimeout)) seconds"), for: server.id)
+            }
+        }
+    }
+
+    private func setState(_ state: StoppedServer.State, for id: UUID) {
+        guard let index = recentlyStopped.firstIndex(where: { $0.id == id }) else { return }
+        recentlyStopped[index].state = state
     }
 
     private func stopAll(_ targets: [Listener]) {

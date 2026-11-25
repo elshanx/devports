@@ -95,6 +95,39 @@ final class DevPortsTests: XCTestCase {
         XCTAssertEqual(second.pgid, pid)
     }
 
+    @MainActor
+    func testRestartReportsRunning() async throws {
+        let folder = URL(fileURLWithPath: Project.home).appendingPathComponent(".ports-test-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let wrapper = Process()
+        wrapper.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
+        wrapper.arguments = ["-c", "import os; os.setpgid(0, 0); os.execvp('sh', ['sh', '-c', "
+            + "'/usr/bin/python3 -m http.server 47127 --bind 127.0.0.1; true'])"]
+        wrapper.currentDirectoryURL = folder
+        try wrapper.run()
+
+        let store = Store()
+        store.stop(try await waitForListener(port: 47127))
+        let stopped = try await waitFor { store.recentlyStopped.first }
+        XCTAssertEqual(stopped.state, .stopped)
+
+        store.restart(stopped)
+        XCTAssertTrue(store.recentlyStopped.first?.isStarting ?? false)
+        let running = try await waitFor { store.recentlyStopped.first { $0.state == .running(port: 47127) } }
+        XCTAssertEqual(running.id, stopped.id)
+        if let listener = Scanner.scan().first(where: { $0.ports.contains(47127) }) { kill(-listener.pgid, SIGKILL) }
+    }
+
+    @MainActor
+    private func waitFor<T>(_ check: () -> T?) async throws -> T {
+        for _ in 0..<100 {
+            if let value = check() { return value }
+            try await Task.sleep(for: .milliseconds(200))
+        }
+        throw XCTSkip("Timed out")
+    }
+
     private func waitForListener(port: Int) async throws -> Listener {
         for _ in 0..<50 {
             if let found = Scanner.scan().first(where: { $0.ports.contains(port) }) { return found }
