@@ -145,7 +145,7 @@ The app was built with Claude Code in one long session. Every change was small, 
 ## Running Locally
 
 ```bash
-git clone <this repo>
+git clone https://github.com/elshanx/devports
 cd devports
 ./build-app.sh
 open DevPorts.app
