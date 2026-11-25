@@ -39,6 +39,7 @@ private struct PortChip: View {
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
         .help("Open " + Localhost.url(port))
+        .accessibilityLabel("Open port " + String(port))
     }
 }
 

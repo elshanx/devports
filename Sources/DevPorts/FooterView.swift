@@ -18,14 +18,18 @@ struct FooterView: View {
                 try? FileManager.default.createDirectory(at: logs, withIntermediateDirectories: true)
                 NSWorkspace.shared.open(logs)
             }
-            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh") { store.refresh() }
+            TintedButton(symbol: "arrow.clockwise", tint: .green, help: "Refresh (⌘R)") { store.refresh() }
+                .keyboardShortcut("r")
             TintedButton(symbol: loginItem.isEnabled ? "sunrise.fill" : "sunrise",
                          tint: loginItem.isEnabled ? .purple : .gray,
                          help: loginItem.isEnabled ? "Open at login: on (click to turn off)"
                              : "Open at login: off (click to turn on)") {
                 loginItem.toggle()
             }
-            TintedButton(symbol: "power", tint: .orange, help: "Quit DevPorts") { NSApplication.shared.terminate(nil) }
+            TintedButton(symbol: "power", tint: .orange, help: "Quit DevPorts (⌘Q)") {
+                NSApplication.shared.terminate(nil)
+            }
+            .keyboardShortcut("q")
         }
     }
 }

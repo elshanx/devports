@@ -10,7 +10,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
-        let controller = NSHostingController(rootView: ContentView(store: store, loginItem: loginItem))
+        let controller = NSHostingController(rootView: ContentView(store: store, loginItem: loginItem) { [weak self] in
+            self?.popover.performClose(nil)
+        })
         controller.sizingOptions = .preferredContentSize
         popover.contentViewController = controller
         popover.behavior = .transient
@@ -34,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let window = popover.contentViewController?.view.window
             window?.makeKey()
             window?.makeFirstResponder(nil)
+            NotificationCenter.default.post(name: ContentView.didOpen, object: nil)
         }
     }
 

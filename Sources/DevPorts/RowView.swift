@@ -3,6 +3,7 @@ import SwiftUI
 struct RowView: View {
     let listener: Listener
     let stopping: Bool
+    let selected: Bool
     let onStop: () -> Void
 
     var body: some View {
@@ -30,7 +31,10 @@ struct RowView: View {
             stopButton
         }
         .padding(10)
-        .background(.primary.opacity(0.05), in: RoundedRectangle(cornerRadius: 10))
+        .background(selected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.05),
+                    in: RoundedRectangle(cornerRadius: 10))
+        .accessibilityElement(children: .contain)
+        .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
     @ViewBuilder
@@ -38,7 +42,8 @@ struct RowView: View {
         if stopping {
             ProgressView().controlSize(.small).frame(width: 24, height: 24)
         } else if !Project.isProtected(command: listener.command) || listener.container != nil {
-            TintedButton(symbol: "stop.fill", tint: .red, help: "Stop \(listener.name)", action: onStop)
+            TintedButton(symbol: "stop.fill", tint: .red, help: "Stop \(listener.name) (⌘⌫ when selected)",
+                         action: onStop)
         }
     }
 
@@ -52,6 +57,7 @@ struct KindTile: View {
 
     var body: some View {
         Image(systemName: kind.symbol)
+            .accessibilityLabel(kind.title)
             .font(.system(size: 12, weight: .semibold))
             .foregroundStyle(kind.tint)
             .frame(width: 26, height: 26)
