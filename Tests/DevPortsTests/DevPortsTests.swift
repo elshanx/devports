@@ -94,6 +94,12 @@ final class DevPortsTests: XCTestCase {
         XCTAssertTrue(HotKey {}.isRegistered)
     }
 
+    func testShellStopsCommandsThatHang() {
+        let start = Date()
+        XCTAssertEqual(Shell.run("/bin/sleep", ["10"], timeout: 0.5), "")
+        XCTAssertLessThan(Date().timeIntervalSince(start), 3)
+    }
+
     func testFilterMatchesNameFolderAndPort() {
         let app = Listener(pid: 1, pgid: 1, name: "psstoreaz", command: "node", folder: "/Users/x/dev/shop",
                            ports: [4321], kind: .dev, container: nil)

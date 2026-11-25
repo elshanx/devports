@@ -9,7 +9,7 @@ enum Killer {
     static func stop(_ listener: Listener) async -> StopResult {
         if let container = listener.container {
             guard let docker = DockerReader.path else { return StopResult(error: "Could not stop \(listener.name). The docker command is not installed.") }
-            Shell.run(docker, ["stop", container])
+            Shell.run(docker, ["stop", container], timeout: 30)
             return StopResult(restart: LaunchSpec(executable: docker, arguments: ["docker", "start", container],
                                                   folder: Project.home))
         }

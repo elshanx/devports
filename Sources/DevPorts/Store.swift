@@ -12,6 +12,7 @@ final class Store {
     var message: String?
     private(set) var failedStops: [Listener] = []
     private var timer: Timer?
+    private var isScanning = false
 
     var query = ""
 
@@ -34,9 +35,12 @@ final class Store {
     }
 
     func refresh() {
+        guard !isScanning else { return }
+        isScanning = true
         Task {
             let result = await Task.detached { Scanner.scan() }.value
             listeners = result
+            isScanning = false
             trackRestarts()
         }
     }
