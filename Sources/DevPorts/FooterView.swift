@@ -32,6 +32,7 @@ private struct MoreMenu: View {
             }
             Toggle("Open at Login", isOn: Binding(get: { loginItem.isEnabled }, set: { _ in loginItem.toggle() }))
             Section("Keyboard") {
+                Text(HotKey.title + "  Open DevPorts from any app")
                 Text("↑ ↓  Select a server")
                 Text("↩ or double-click  Open in browser")
                 Text("⌘⌫  Stop selected server")

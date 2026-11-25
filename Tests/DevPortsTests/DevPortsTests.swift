@@ -78,6 +78,11 @@ final class DevPortsTests: XCTestCase {
         XCTAssertFalse(astro.onRandomPortsOnly)
     }
 
+    @MainActor
+    func testRegistersGlobalHotKey() {
+        XCTAssertTrue(HotKey {}.isRegistered)
+    }
+
     func testFilterMatchesNameFolderAndPort() {
         let app = Listener(pid: 1, pgid: 1, name: "psstoreaz", command: "node", folder: "/Users/x/dev/shop",
                            ports: [4321], kind: .dev, container: nil)

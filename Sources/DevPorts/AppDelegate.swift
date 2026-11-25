@@ -7,6 +7,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private let loginItem = LoginItem()
     private let statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let popover = NSPopover()
+    private var hotKey: HotKey?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -30,6 +31,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             button.action = #selector(togglePopover)
         }
         showDevServerCount()
+        hotKey = HotKey { [weak self] in self?.togglePopover() }
         loginItem.enableOnFirstLaunch()
     }
 
@@ -43,6 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             popover.performClose(nil)
         } else {
             store.refresh()
+            NSApp.activate()
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             let window = popover.contentViewController?.view.window
             window?.makeKey()
