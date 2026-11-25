@@ -11,7 +11,7 @@ struct ContentView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header.padding(14)
+            header.padding(.horizontal, 14).padding(.vertical, 10)
             Divider()
             ScrollViewReader { proxy in
                 ScrollView {
@@ -82,12 +82,10 @@ struct ContentView: View {
     }
 
     private var header: some View {
-        HStack(alignment: .center) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("DevPorts").font(.system(size: 15, weight: .bold))
-                Text(summary).font(.caption).foregroundStyle(.secondary)
-            }
+        HStack(alignment: .firstTextBaseline) {
+            Text("DevPorts").font(.system(size: 13, weight: .bold))
             Spacer()
+            Text(summary).font(.caption).foregroundStyle(.secondary)
         }
     }
 
