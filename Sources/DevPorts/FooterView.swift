@@ -33,7 +33,7 @@ private struct MoreMenu: View {
             Toggle("Open at Login", isOn: Binding(get: { loginItem.isEnabled }, set: { _ in loginItem.toggle() }))
             Section("Keyboard") {
                 Text("↑ ↓  Select a server")
-                Text("↩  Open in browser")
+                Text("↩ or double-click  Open in browser")
                 Text("⌘⌫  Stop selected server")
                 Text("Esc  Close")
             }

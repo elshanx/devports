@@ -16,6 +16,7 @@ struct RowView: View {
         .padding(.vertical, listener.kind == .other ? 6 : 10)
         .background(selected ? Color.accentColor.opacity(0.18) : Color.primary.opacity(0.05),
                     in: RoundedRectangle(cornerRadius: 10))
+        .help(listener.opensInBrowser ? "Double-click to open " + Localhost.url(listener.mainPorts.first ?? 0) : "")
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
@@ -90,6 +91,21 @@ struct KindTile: View {
             .foregroundStyle(kind.tint)
             .frame(width: 26, height: 26)
             .background(kind.tint.opacity(0.15), in: RoundedRectangle(cornerRadius: 7))
+    }
+}
+
+extension Listener {
+    var opensInBrowser: Bool { kind != .other }
+
+    func matches(_ query: String) -> Bool {
+        query.isEmpty || name.localizedCaseInsensitiveContains(query)
+            || (folder ?? "").localizedCaseInsensitiveContains(query)
+            || ports.contains { String($0).hasPrefix(query) }
+    }
+
+    func openInBrowser() {
+        guard opensInBrowser, let port = mainPorts.first else { return }
+        Localhost.open(port)
     }
 }
 

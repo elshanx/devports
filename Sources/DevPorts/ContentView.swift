@@ -16,13 +16,10 @@ struct ContentView: View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack(alignment: .leading, spacing: 14) {
-                        if store.visible.isEmpty {
+                        if store.ordered.isEmpty && store.randomRows.isEmpty {
                             emptyState
                         } else {
-                            sections
-                        }
-                        if store.showAll, !store.randomPortApps.isEmpty {
-                            randomPortsToggle
+                            ListenerList(store: store, selection: $selection) { listFocused = true }
                         }
                         if !store.recentlyStopped.isEmpty {
                             RecentlyStoppedView(store: store)
@@ -52,7 +49,7 @@ struct ContentView: View {
         .focusEffectDisabled()
         .onKeyPress(.downArrow) { moveSelection(by: 1) }
         .onKeyPress(.upArrow) { moveSelection(by: -1) }
-        .onKeyPress(.return) { act(openMainPort) }
+        .onKeyPress(.return) { act { $0.openInBrowser() } }
         .onKeyPress(.delete, phases: .down) { press in
             press.modifiers.contains(.command) ? act { store.stop($0) } : .ignored
         }
@@ -66,25 +63,16 @@ struct ContentView: View {
         }
     }
 
-    private var ordered: [Listener] {
-        [Listener.Kind.dev, .docker, .other].flatMap { kind in store.visible.filter { $0.kind == kind } }
-    }
-
     private func moveSelection(by step: Int) -> KeyPress.Result {
-        let ids = ordered.map(\.id)
+        let ids = store.ordered.map(\.id)
         guard !ids.isEmpty else { return .ignored }
         let current = selection.flatMap { ids.firstIndex(of: $0) } ?? (step > 0 ? -1 : ids.count)
         selection = ids[min(max(current + step, 0), ids.count - 1)]
         return .handled
     }
 
-    private func openMainPort(_ listener: Listener) {
-        guard listener.kind != .other, let port = listener.mainPorts.first else { return }
-        Localhost.open(port)
-    }
-
     private func act(_ action: (Listener) -> Void) -> KeyPress.Result {
-        guard let listener = ordered.first(where: { $0.id == selection }) else { return .ignored }
+        guard let listener = store.ordered.first(where: { $0.id == selection }) else { return .ignored }
         action(listener)
         return .handled
     }
@@ -102,40 +90,6 @@ struct ContentView: View {
         case 0: "No dev servers running"
         case 1: "1 dev server running"
         case let count: "\(count) dev servers running"
-        }
-    }
-
-    private var sections: some View {
-        ForEach([Listener.Kind.dev, .docker, .other], id: \.self) { kind in
-            let listeners = store.visible.filter { $0.kind == kind }
-            if !listeners.isEmpty {
-                VStack(alignment: .leading, spacing: 6) {
-                    if store.showAll { SectionTitle(text: kind.title) }
-                    ForEach(listeners) { listener in
-                        RowView(listener: listener, stopping: store.stopping.contains(listener.id),
-                                selected: selection == listener.id) {
-                            store.stop(listener)
-                        }
-                        .id(listener.id)
-                        .contentShape(Rectangle())
-                        .onTapGesture(count: 2) { openMainPort(listener) }
-                        .onTapGesture {
-                            selection = listener.id
-                            listFocused = true
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var randomPortsToggle: some View {
-        let count = store.randomPortApps.count
-        let apps = count == 1 ? "1 app on a random port" : "\(count) apps on random ports"
-        return TintedButton(title: (store.showRandomPorts ? "Hide " : "Show ") + apps,
-                            symbol: store.showRandomPorts ? "chevron.up" : "chevron.down", tint: .secondary, quiet: true,
-                            help: "Apps that listen only on ports above 49152, picked at random by the system") {
-            store.showRandomPorts.toggle()
         }
     }
 

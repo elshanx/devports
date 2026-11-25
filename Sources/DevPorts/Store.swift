@@ -12,8 +12,17 @@ final class Store {
     var message: String?
     private var timer: Timer?
 
-    var visible: [Listener] { showAll ? listeners.filter { showRandomPorts || !$0.onRandomPortsOnly } : devServers }
-    var randomPortApps: [Listener] { listeners.filter(\.onRandomPortsOnly) }
+    var query = ""
+
+    var ordered: [Listener] {
+        [Listener.Kind.dev, .docker, .other].flatMap(group) + (showRandomPorts ? randomRows : [])
+    }
+    var randomRows: [Listener] { showAll ? shown.filter(\.onRandomPortsOnly) : [] }
+    private var shown: [Listener] { (showAll ? listeners : devServers).filter { $0.matches(query) } }
+
+    func group(_ kind: Listener.Kind) -> [Listener] {
+        shown.filter { $0.kind == kind && !$0.onRandomPortsOnly }
+    }
     var devServers: [Listener] { listeners.filter { $0.kind == .dev } }
 
     init() {
