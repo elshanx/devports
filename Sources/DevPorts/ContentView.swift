@@ -101,7 +101,11 @@ struct ContentView: View {
         HStack(alignment: .firstTextBaseline) {
             Text("DevPorts").font(.system(size: 13, weight: .bold))
             Spacer()
-            if store.query.isEmpty {
+            if store.query.isEmpty && store.showAll {
+                Label("Type to filter", systemImage: "magnifyingglass")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else if store.query.isEmpty {
                 Text(summary).font(.caption).foregroundStyle(.secondary)
             } else {
                 Label(store.query, systemImage: "magnifyingglass")
